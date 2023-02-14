@@ -1,0 +1,5 @@
+light_purple = "#662c92"
+dark_purple = "#a283be" 
+deep_gray = "#5f5367"
+blue = "#6888a7"
+light_blue = "#d1dbe4"

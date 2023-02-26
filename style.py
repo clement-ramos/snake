@@ -1,5 +1,8 @@
-light_purple = "#662c92"
-dark_purple = "#a283be" 
-deep_gray = "#5f5367"
-blue = "#6888a7"
-light_blue = "#d1dbe4"
+# Colors
+
+WHITE = "#ffffff"
+BLACK = "#000000"
+PURPLE = "#a283be"
+LIGHT_PURPLE = "#662c92"
+GRAY = "#5f5367"
+BLUE = "#6888a7"

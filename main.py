@@ -1,127 +1,143 @@
-import pygame, sys, random
+import pygame, sys, json
 from style import *
-from pygame.math import Vector2 #Allow me to simply call Vector2
+from snake import main as snake
+from button import BUTTON
 
-class FRUIT:
-    def __init__(self):
-        self.randomize()
+# Functions 
 
-    def draw_fruit(self):
-        fruit_rect = pygame.Rect(int(self.position.x * cell_size), int(self.position.y * cell_size),cell_size,cell_size)
-        pygame.draw.rect(screen, dark_purple, fruit_rect)
+def get_font(size):
+    return pygame.font.Font("assets/GLS.ttf", size)
 
-    def randomize(self):
-        # add a part to avoid fruit spawning on the snake body
-        self.x = random.randint(0, cell_number - 1)
-        self.y = random.randint(0, cell_number - 1)
-        self.position = Vector2(self.x, self.y)
+def write_text(text, size, x, y):
+    text_font = get_font(size)
+    title_surface = text_font.render(text, True, BLACK, PURPLE)
+    score_rect = title_surface.get_rect(center = (x, y))
+    screen.blit(title_surface, score_rect)
 
-class SNAKE:
-    def __init__(self):
-        self.body = [Vector2(5, 10), Vector2(4, 10), Vector2(3, 10)]
-        self.direction = Vector2(1,0)
-        self.new_block = False
 
-    def draw_snake(self):
-        for block in self.body:
-            x_pos = int(block.x * cell_size)
-            y_pos = int(block.y * cell_size)
-            block_rect = pygame.Rect(x_pos, y_pos, cell_size, cell_size)
-            pygame.draw.rect(screen, light_purple, block_rect)
+# menu Function 
 
-    def move_snake(self):
-        if self.new_block == True:
-            body_copy = self.body[:]
-            self.new_block = False
-        else:
-            body_copy = self.body[:-1] #delete the last element off the body
+def def_user():
+    #PYGAME
+    pygame.init()
+    word=""
+    # window parameter
+    WIDTH, HEIGHT = 600, 600
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen.fill(pygame.Color(PURPLE))
 
-        body_copy.insert(0, body_copy[0] + self.direction) #make the head move forward to make the snake move
-        self.body = body_copy[:]
+    write_text("Enter your username: ", 60, 300, 100) #example asking name
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.KEYDOWN:
+                if event.unicode.isalpha():
+                    word += event.unicode.upper()
+                
+                if event.key == pygame.K_RETURN:
+                    return word
+                    
 
-    def add_block(self):
-        self.new_block = True
+        # timer and FPS
+        pygame.display.update()
+        clock.tick(60)
 
-class MAIN:
-    def __init__(self):
-        self.snake = SNAKE()
-        self.fruit = FRUIT()
+        write_text(word, 40, 300, 300) 
 
-    def update(self):
-        self.snake.move_snake()  
-        self.check_collision()
-        self.check_fail()
+menu_button = BUTTON(WHITE, 200 ,500, 200, 60, "Back")
 
-    def draw_elements(self):
-        self.fruit.draw_fruit()
-        self.snake.draw_snake()
-        self.draw_score()
+def scoreboard():
+    #PYGAME
+    pygame.init()
+    # window parameter
+    WIDTH, HEIGHT = 600, 600
+    screen = pygame.display.set_mode((WIDTH, HEIGHT))
+    screen.fill(pygame.Color(PURPLE))
 
-    def check_collision(self):
-        if self.fruit.position == self.snake.body[0]: #head of snake  
-            # reposition fruit
-            self.fruit.randomize()
-            # add a block to the snake
-            self.snake.add_block()
+    write_text("Scoreboard", 60, 300, 100) #example asking name
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if menu_button.is_over(pygame.mouse.get_pos()):
+                    main()
 
-    def check_fail(self):   
-        #check if the snake hit the border
-        if not 0 <= self.snake.body[0].x < cell_number or not 0 <= self.snake.body[0].y < cell_number:
-            self.game_over()
+        draw_top_3()
 
-        #check if the snake hit his self
-        for block in self.snake.body[1:]:
-            if block == self.snake.body[0]:
-                self.game_over()
+        # timer and FPS
+        pygame.display.update()
+        clock.tick(60)
+        menu_button.draw(screen)
 
-    def game_over(self):
-            pygame.quit()
-            sys.exit()
 
-    def draw_score(self):
-        score_text = str(len(self.snake.body) - 3)
-        score_surface = game_font.render(score_text, True, deep_gray)
-        score_x = int(cell_size * cell_number - 60)
-        score_y = int(cell_size * cell_number - 40)
-        score_rect = score_surface.get_rect(center = (score_x, score_y))
-        screen.blit(score_surface, score_rect)
+def draw_top_3():
 
+    with open('score.json', 'r') as file:
+        user_list = json.load(file)
+    
+    sorted_user_list = dict(sorted(user_list.items(), key=lambda x:x[1]))
+    first_three_items = list(sorted_user_list.items())[-3:]
+
+    write_text(first_three_items[2][0] + " : " + str(first_three_items[2][1]), 30, 300, 200)
+    write_text(first_three_items[1][0] + " : " + str(first_three_items[1][1]), 30, 300, 300)
+    write_text(first_three_items[0][0] + " : " + str(first_three_items[0][1]), 30, 300, 400)
+
+#PYGAME
 pygame.init()
-#define my grind dependinc on cell number to make it easily modulable
-cell_size = 40
-cell_number = 15
-screen = pygame.display.set_mode((cell_number * cell_size, cell_number * cell_size))
+
+# window parameter
+WIDTH, HEIGHT = 600, 600
+screen = pygame.display.set_mode((WIDTH, HEIGHT))
+
+# clock parameter
 clock = pygame.time.Clock() #clock normalize speed of exe in every computer(not impacted anymore by it calculation speed)
-game_font = pygame.font.Font("Assets/Goodnight-London-Sans.ttf", 32)
 
 SCREEN_UPDATE = pygame.USEREVENT
 pygame.time.set_timer(SCREEN_UPDATE, 150) #150 ms 
 
-main_game = MAIN()
+#My buttons         (color, x, y, width, height, text):
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            pygame.quit()
-            sys.exit()
-        if event.type == SCREEN_UPDATE:
-            main_game.update()
-        if event.type == pygame.KEYDOWN:
-            if event.key == pygame.K_UP:
-                if main_game.snake.direction.y != 1: #avoid to half turn
-                    main_game.snake.direction = Vector2(0, -1) #change vector to go up
-            if event.key == pygame.K_RIGHT:
-                if main_game.snake.direction.x != -1:
-                    main_game.snake.direction = Vector2(1, 0) 
-            if event.key == pygame.K_DOWN:
-                if main_game.snake.direction.y != -1:
-                    main_game.snake.direction = Vector2(0, 1) 
-            if event.key == pygame.K_LEFT:
-                if main_game.snake.direction.x != 1:    
-                    main_game.snake.direction = Vector2(-1, 0) 
-                
-    screen.fill(pygame.Color(light_blue))
-    main_game.draw_elements()
-    pygame.display.update()
-    clock.tick(60)
+play_button = BUTTON(WHITE, 200 ,200, 200, 60, "Play")
+scoreboard_button = BUTTON(WHITE, 150, 300, 300, 60, "Scoreboard")
+exit_button = BUTTON(WHITE, 200 ,400, 200, 60, "Exit")
 
+
+#Main loop
+
+def main():
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                    if play_button.is_over(pygame.mouse.get_pos()):
+                        username = def_user()
+                        snake(username) 
+                    if scoreboard_button.is_over(pygame.mouse.get_pos()):
+                        scoreboard()
+                    if exit_button.is_over(pygame.mouse.get_pos()):
+                        pygame.quit()
+                        sys.exit()
+
+        # display elements
+
+        screen.fill(pygame.Color(PURPLE))
+
+        write_text("Snake Game", 72, 300, 100)
+        # Draw buttons 
+            
+        play_button.draw(screen)
+        scoreboard_button.draw(screen)
+        exit_button.draw(screen)
+
+        # timer and FPS
+        pygame.display.update()
+        clock.tick(60)
+
+main()

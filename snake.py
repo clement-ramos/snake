@@ -141,7 +141,7 @@ def main(username):
                     if main_game.snake.direction.x != 1:    
                         main_game.snake.direction = Vector2(-1, 0) 
                     
-        screen.fill(pygame.Color(BLUE))
+        screen.fill(pygame.Color(WHITE))
         main_game.draw_elements()
         pygame.display.update()
         clock.tick(60)

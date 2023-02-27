@@ -20,7 +20,7 @@ class BUTTON():
         
         if self.text != '':
             font = pygame.font.Font("Assets/GLS.ttf", 50)
-            text = font.render(self.text, 1, WHITE)
+            text = font.render(self.text, 1, BLACK)
             win.blit(text, (self.x + (self.width/2 - text.get_width()/2), self.y + (self.height/2 - text.get_height()/2)))
 
     def is_over(self, pos):

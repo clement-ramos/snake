@@ -33,6 +33,9 @@ def def_user():
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_BACKSPACE:
+                    word = word[:-1]
+                    write_text("        ",80, 300, 300)
                 if event.unicode.isalpha():
                     word += event.unicode.upper()
                 
